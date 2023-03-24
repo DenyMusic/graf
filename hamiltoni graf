@@ -1,0 +1,157 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+using namespace std;
+
+//szomszedossagi matrix
+int m[10][10];
+//a csomopontok szama + 1
+int n;
+int y=0;
+bool h=false;
+
+bool leall(vector<int> v)
+{
+
+    if (v.size() == n)
+    {
+        return true;
+
+    }
+    else
+    {
+        return false;
+    }
+
+}
+/**
+Logikai fuggveny, mely megvizsgalja, hogy a jelenlegi csomopontbol lehetseges e a kovetkezo csompontba jutni
+
+Parameterkent atadjuk a jelenlegi, a kovetkezo csomopontokat,
+illetve a vektort, ahol az eddig bejart csomopontokat taroljuk.
+
+Ha van osszekottetes a jelenlegi s a kovetkezo csomopont kozott,
+illetve meg nem jartunk a kovetkezo csomopontban, akkro igazat terit vissza,
+maskepp hamisat
+*/
+bool lehet(int jelenlegi, int kovetkezo, vector<int> v)
+{
+    //van-e osszekottestes a ket csomopont kozott
+    if (m[jelenlegi][kovetkezo] == 0)
+    {
+        return false;
+    }
+    //jartunk e mar kovetkezo csomopontban
+    for (int i=0; i<v.size(); i++)
+    {
+        if (v[i] == kovetkezo)
+        {
+            return false;
+        }
+    }
+    return true;
+
+}
+/**
+Fuggveny a vector kiirasara
+*/
+void kiir(vector<int> v)
+{
+    if(y==0)
+    {
+        if(!h)
+        {
+            for(int i=0; i<v.size(); i++)
+            {
+                cout << v[i] << " ";
+                y++;
+                h=1;
+            }
+
+
+        }
+    }
+    cout << endl;
+}
+
+/**
+backtrack fuggveny, amely a jelenlegi csomopontbol kiindulva megprobal
+majd minden egyeb csomopontba menni, ha lehetseges.
+
+Ha az osszes csomopontot bejartuk, a fuggveny meghivja a kiiras fuggvenyt
+*/
+void backtrack(int jelenlegi, vector<int> v)
+{
+    // ha bejartunk mindent, irjuk ki a megoldast
+    if (leall(v))
+    {
+        kiir(v);
+        return;
+    }
+    //probaljunk meg az osszes lehetseges
+    //csomopontba atmenni, ha lehet
+    for(int i = 0; i<n+1; i++)
+    {
+        //csak akkor probaljunk tovabblepni,
+        //ha nem a jelenlegi be szeretnenk lepni
+        if (i!=jelenlegi)
+        {
+            if (lehet(jelenlegi, i, v))
+            {
+
+                vector<int> tempv = v;
+                tempv.push_back(i);
+
+
+                backtrack(i, tempv);
+            }
+        }
+    }
+
+}
+
+
+int main()
+{
+    ifstream inp("input.txt");
+    inp>>n;
+    ofstream of("out.txt");
+    //szomszedossagi matrix inicializalasa
+    int i, j;
+
+    for(i=1; i<n+1; i++)
+    {
+        for(j=1; j<n+1; j++)
+        {
+            inp>>m[i][j];
+
+        }
+    }
+    for(i=0; i<n+1; i++)
+    {
+        for(j=0; j<n+1; j++)
+        {
+            cout << m[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout<<endl;
+    //probaljuk meg minden elbol bejarni a grafot
+    for(i=1; i<n; i++)
+    {
+        vector<int> v;
+        v.push_back(i);
+        backtrack(i, v);
+    }
+    if(!h)
+    {
+        cout<<"nem hamiltoni";
+    }
+    if(h)
+    {
+        cout<<"hamiltoni";
+    }
+    cout << endl;
+    cout << endl;
+    return 0;
+}
